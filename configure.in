@@ -1,0 +1,98 @@
+AC_PREREQ(2.59)
+AC_INIT([xbuild], [1.0.0], [https://github.com/johnsonlee])
+AC_CONFIG_FILES(Makefile.include)
+
+if test "$prefix" = "NONE"; then
+  AC_MSG_ERROR("--prefix was not specified");
+fi
+
+AC_ARG_WITH([toolchain],
+  [AS_HELP_STRING([--with-toolchain], [specify path to toolchain])],
+  [use_toolchain=$withval],
+  AC_MSG_ERROR([No toolchain defined]))
+
+AC_ARG_WITH([tarballs],
+  [AS_HELP_STRING([--with-tarballs], [path where tarballs will be saved])],
+  [use_tarballs=$withval],
+  [if test -z $use_tarballs; then AC_MSG_ERROR([No tarballs path defined]); fi])
+
+AC_ARG_WITH([cpu],
+  [AS_HELP_STRING([--with-cpu], [optional. specify target cpu. guessed if not specified.])],
+  [use_cpu=$withval],
+  [use_cpu=no])
+
+use_prefix=$prefix
+
+AC_PROG_CXX
+AC_PROG_CC
+
+AC_CHECK_PROG(HAVE_UNZIP,unzip,yes,no,)
+if test "$HAVE_UNZIP" = "no"; then
+  AC_MSG_ERROR("Missing program: unzip")
+fi
+
+AC_CHECK_PROG(HAVE_ZIP,zip,yes,no,)
+if test "$HAVE_ZIP" = "no"; then
+  AC_MSG_ERROR("Missing program: zip")
+fi
+
+AC_PATH_PROG(TAR,tar,no,)
+if test "$TAR" = "no"; then
+  AC_MSG_ERROR("Missing program: tar")
+fi
+
+AC_PATH_PROG(WGET,wget,no,)
+if test "$WGET" = "no"; then
+  AC_MSG_ERROR("Missing program: wget")
+fi
+
+# find host toolchain
+AC_CHECK_PROG(host_gcc,$host_gcc,yes,no,$use_toolchain/bin)
+if test "$host_gcc" = "no"; then
+  AC_MSG_WARN("host was not specified, guessing...");
+  AC_PATH_PROG(host_gcc,gcc,no,[$use_toolchain/*/bin])
+  if test "$host_gcc" = "no"; then
+    AC_MSG_ERROR("Toolchain not found at specified path")
+  fi
+  use_host=`$host_gcc -dumpmachine 2>/dev/null`
+else
+  use_host=$host
+fi
+
+#guess host cpu
+if test "$use_cpu" = "no"; then
+  case $use_host in
+    arm*)
+	  use_cpu="armv4t"
+	;;
+	*i686*)
+	  use_cpu="x86"
+	;;
+	*x86_64*)
+	  use_cpu="x86_64"
+	;;
+	*)
+	  AC_MSG_ERROR("unsupported host ($host)")
+  esac
+fi
+
+if test "$use_prefix" = "NONE"; then
+  AC_MSG_ERROR("prefix was not specified");
+fi
+
+AC_SUBST(use_arch)
+AC_SUBST(use_host)
+AC_SUBST(use_prefix)
+AC_SUBST(use_cpu)
+AC_SUBST(use_toolchain)
+AC_SUBST(use_tarballs)
+
+echo "------------------------------------------------------------"
+echo "  host:      $use_host"
+echo "  prefix:    $use_prefix"
+echo "  toolchain: $use_toolchain"
+echo "  cpu:       $use_cpu"
+echo "  tarballs:  $use_tarballs"
+echo "------------------------------------------------------------"
+
+AC_OUTPUT

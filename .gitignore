@@ -1,0 +1,6 @@
+.*.swp
+.install-*
+*.cache
+config.log
+config.status
+configure

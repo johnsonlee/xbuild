@@ -1,0 +1,76 @@
+TOOLCHAIN=@use_toolchain@
+PREFIX=@use_prefix@
+TARBALLS_LOCATION=@use_tarballs@
+HOST=@use_host@
+PLATFORM=@use_cpu@
+NATIVEPLATFORM=@use_cpu@-native
+WGET=@WGET@
+TAR=@TAR@
+
+ifneq ($(OVERRIDE_TOOLCHAIN),)
+	TOOLCHAIN=$(OVERRIDE_TOOLCHAIN)
+endif
+
+ifneq ($(OVERRIDE_PLATFORM),)
+	PLATFORM=$(OVERRIDE_PLATFORM)
+	PLATFORM=$(OVERRIDE_PLATFORM)-native
+endif
+
+ifneq ($(OVERRIDE_HOST),)
+	HOST=$(OVERRIDE_HOST)
+endif
+
+PREFIX=@use_prefix@/$(PLATFORM)
+NATIVEPREFIX=@use_prefix@/$(NATIVEPLATFORM)
+
+PLATFORM_FLAGS=
+ifneq ($(PLATFORM),)
+	PLATFORM_FLAGS+=-march=$(PLATFORM)
+endif
+
+WGET_FLAGS=-q -P $(TARBALLS_LOCATION)
+TAR_FLAGS=-C $(PLATFORM) --strip-components=1 -xf
+
+ifneq ($(NATIVE_BUILD),1)
+	export SYSROOT=$(TOOLCHAIN)/sysroot
+	export CROSSTOOLS=$(TOOLCHAIN)/bin/$(HOST)-
+	export LD=$(CROSSTOOLS)ld
+	export CC=$(CROSSTOOLS)gcc
+	export CXX=$(CROSSTOOLS)g++
+	export AR=$(CROSSTOOLS)ar
+	export AS=$(CROSSTOOLS)as
+	export NM=$(CROSSTOOLS)nm
+	export STRIP=$(CROSSTOOLS)strip
+	export RANLIB=$(CROSSTOOLS)ranlib
+	export OBJDUMP=$(CROSSTOOLS)objdump
+	export READELF=$(CROSSTOOLS)readelf
+	export CFLAGS=$(PLATFORM_FLAGS) -I$(PREFIX)/include
+	export LDFLAGS=$(PLATFORM_FLAGS) -L$(PREFIX)/lib
+	export CPPFLAGS=$(PLATFORM_FLAGS) -I$(PREFIX)/include
+	export CXXFLAGS=$(PLATFORM_FLAGS) -I$(PREFIX)/include -frtti
+
+	export LD_LIBRARY_PATH:=$(PREFIX)/lib:$(LD_LIBRARY_PATH)
+	export PKG_CONFIG_PATH=$(PREFIX)/lib/pkgconfig:$(PREFIX)/share/pkgconfig
+
+	export AUTOMAKE=$(PREFIX)/bin/automake
+	export AUTOCONF=$(PREFIX)/bin/autoconf
+	export ACLOCAL=$(PREFIX)/bin/aclocal
+	export ACLOCAL_PATH=$(PREFIX)/share/aclocal
+	export LIBTOOLIZE=$(PREFIX)/bin/libtoolize
+	export AUTORECONF=$(PREFIX)/bin/autoreconf
+else
+	PLATFORM=$(NATIVEPLATFORM)
+	PREFIX=$(NATIVEPREFIX)
+
+	export CFLAGS=-I$(PREFIX)/include
+	export LDFLAGS=-L$(PREFIX)/lib
+	export CPPFLAGS=-I$(PREFIX)/include
+	export CXXFLAGS=-I$(PREFIX)/include
+
+	export LD_LIBRARY_PATH:=$(PREFIX)/lib:$(LD_LIBRARY_PATH)
+	export PKG_CONFIG_PATH=$(PREFIX)/lib/pkgconfig:$(PREFIX)/share/pkgconfig
+endif
+
+export PKG_CONFIG=$(NATIVEPREFIX)/bin/pkg-config
+export PATH:=$(NATIVEPREFIX)/bin:$(PATH)
+
