@@ -1,32 +1,28 @@
-NATIVE_BUILD=1
-
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = readline
+LIBVER  = 6.2
+LIBURL  = http://ftp.gnu.org/gnu/readline
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz
-
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
 
 all: .install-$(PLATFORM)
 
 $(TARBALLS_LOCATION)/$(LIBFILE):
-	@echo "Downloading from $(LIBURL)/$(LIBFILE)"
+	@echo "Downloading $(LIBURL)/$(LIBFILE) -> $(TARBALLS_LOCATION)"
 	@$(WGET) $(WGET_FLAGS) $(LIBURL)/$(LIBFILE)
 
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
 
-$(PCFILE): $(PLATFORM)
+.install-$(PLATFORM): configure
 	@$(MAKE) -C $(PLATFORM)
-
-.install-$(PLATFORM): $(PCFILE)
 	@$(MAKE) -C $(PLATFORM) install
 	@touch $@
+
+configure: $(PLATFORM)
+	@cd $(PLATFORM); ./configure --build=$(BUILD) --host=$(HOST) --prefix=$(PREFIX)
 
 clean:
 	@$(MAKE) -C $(PLATFORM) clean

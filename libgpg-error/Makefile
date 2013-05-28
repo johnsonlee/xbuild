@@ -1,14 +1,12 @@
-NATIVE_BUILD=1
-
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = libgpg-error
+LIBVER  = 1.10
+LIBURL  = ftp://ftp.gnupg.org/gcrypt/libgpg-error
 LIBSRC  = $(LIBNAME)-$(LIBVER)
-LIBFILE = $(LIBSRC).tar.gz
+LIBFILE = $(LIBSRC).tar.bz2
 
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
+LAFILE = $(PREFIX)/lib/$(LIBNAME).la
 
 all: .install-$(PLATFORM)
 
@@ -19,12 +17,12 @@ $(TARBALLS_LOCATION)/$(LIBFILE):
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
+	@cd $(PLATFORM); ./configure --build=$(BUILD) --host=$(HOST) --prefix=$(PREFIX)
 
-$(PCFILE): $(PLATFORM)
+$(LAFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)
 
-.install-$(PLATFORM): $(PCFILE)
+.install-$(PLATFORM): $(LAFILE)
 	@$(MAKE) -C $(PLATFORM) install
 	@touch $@
 

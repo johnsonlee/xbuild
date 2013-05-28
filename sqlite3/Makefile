@@ -1,25 +1,23 @@
-NATIVE_BUILD=1
-
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = sqlite-autoconf
+LIBVER  = 3071501
+LIBURL  = http://www.sqlite.org
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz
 
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
+PCFILE = $(PREFIX)/lib/pkgconfig/sqlite3.pc
 
 all: .install-$(PLATFORM)
 
 $(TARBALLS_LOCATION)/$(LIBFILE):
-	@echo "Downloading from $(LIBURL)/$(LIBFILE)"
+	@echo "Downloading $(LIBURL)/$(LIBFILE) -> $(TARBALLS_LOCATION)"
 	@$(WGET) $(WGET_FLAGS) $(LIBURL)/$(LIBFILE)
 
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
+	@cd $(PLATFORM); ./configure --build=$(BUILD) --host=$(HOST) --prefix=$(PREFIX)
 
 $(PCFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)

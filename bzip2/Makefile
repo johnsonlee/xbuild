@@ -1,14 +1,12 @@
-NATIVE_BUILD=1
-
 include ../Makefile.include
 
-LIBNAME = Python
-LIBVER  = 2.7.3
-LIBURL  = http://www.python.org/ftp/python/2.7.3
+LIBNAME = bzip2
+LIBVER  = 1.0.6
+LIBURL  = http://bzip.org/1.0.6
 LIBSRC  = $(LIBNAME)-$(LIBVER)
-LIBFILE = $(LIBSRC).tar.bz2
+LIBFILE = $(LIBSRC).tar.gz
 
-BINFILE = $(PREFIX)/bin/python
+BINFILE = $(PREFIX)/lib/libbz2.so $(PREFIX)/lib/libbz2.a
 
 all: .install-$(PLATFORM)
 
@@ -16,17 +14,18 @@ $(TARBALLS_LOCATION)/$(LIBFILE):
 	@echo "Downloading $(LIBURL)/$(LIBFILE) -> $(TARBALLS_LOCATION)"
 	@$(WGET) $(WGET_FLAGS) $(LIBURL)/$(LIBFILE)
 
-$(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
+$(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE) Makefile.patch
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
+	@cd $(PLATFORM); patch -p1 < ../libbz2-xcompile.patch
 
 $(BINFILE): $(PLATFORM)
-	@$(MAKE) -C $(PLATFORM)
-	@if [ ! -f $(PREFIX)/bin/pgen ]; then cp -v $(PLATFORM)/Parser/pgen $(PREFIX)/bin; fi
+	@$(MAKE) -C $(PLATFORM) PREFIX=$(PREFIX)
+	@$(MAKE) -C $(PLATFORM) -f Makefile-libbz2_so PREFIX=$(PREFIX)
 
 .install-$(PLATFORM): $(BINFILE)
-	@$(MAKE) -C $(PLATFORM) install
+	@$(MAKE) -C $(PLATFORM) install PREFIX=$(PREFIX)
+	@$(MAKE) -C $(PLATFORM) -f Makefile-libbz2_so install PREFIX=$(PREFIX)
 	@touch $@
 
 clean:

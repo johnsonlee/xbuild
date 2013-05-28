@@ -2,8 +2,8 @@ TOOLCHAIN=@use_toolchain@
 PREFIX=@use_prefix@
 TARBALLS_LOCATION=@use_tarballs@
 HOST=@use_host@
-PLATFORM=@use_cpu@
-NATIVEPLATFORM=@use_cpu@-native
+PLATFORM=@host_platform@
+NATIVEPLATFORM=@build_platform@
 WGET=@WGET@
 TAR=@TAR@
 
@@ -20,12 +20,12 @@ ifneq ($(OVERRIDE_HOST),)
 	HOST=$(OVERRIDE_HOST)
 endif
 
-PREFIX=@use_prefix@/$(PLATFORM)
-NATIVEPREFIX=@use_prefix@/$(NATIVEPLATFORM)
+PREFIX=@use_prefix@/$(PLATFORM)/usr
+NATIVEPREFIX=@use_prefix@/$(NATIVEPLATFORM)/usr
 
 PLATFORM_FLAGS=
-ifneq ($(PLATFORM),)
-	PLATFORM_FLAGS+=-march=$(PLATFORM)
+ifneq ($(MARCH),)
+	PLATFORM_FLAGS+=-march=$(MARCH)
 endif
 
 WGET_FLAGS=-q -P $(TARBALLS_LOCATION)
@@ -62,6 +62,16 @@ else
 	PLATFORM=$(NATIVEPLATFORM)
 	PREFIX=$(NATIVEPREFIX)
 
+	export LD=ld
+	export CC=gcc
+	export CXX=g++
+	export AR=ar
+	export AS=as
+	export NM=nm
+	export STRIP=strip
+	export RANLIB=ranlib
+	export OBJDUMP=objdump
+	export READELF=readelf
 	export CFLAGS=-I$(PREFIX)/include
 	export LDFLAGS=-L$(PREFIX)/lib
 	export CPPFLAGS=-I$(PREFIX)/include

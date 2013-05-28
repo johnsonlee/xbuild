@@ -1,26 +1,41 @@
-BUILDTOOLS=help2man-native autoconf-native automake-native gettext-native libtool-native pkg-config-native
+BUILDTOOLS=autoconf-native automake-native bison-native gettext-native help2man-native libtool-native m4-native pkg-config-native
 
 SUBDIRS=\
+	bzip2 \
 	expat \
+	fontconfig \
+	freetype2 \
 	gettext \
 	glib glib-native \
 	libffi libffi-native \
-	libiconv \
+	libgcrypt \
+	libgpg-error \
+	libiconv libiconv-native \
 	libjpeg \
 	libpng \
-	libtiff \
 	libxml2 libxml2-native \
 	libxslt libxslt-native \
+	openssl \
 	python27 python27-native \
+	sqlite3 \
 	zlib zlib-native
 
 .PHONY: buildtools $(BUILDTOOLS) subdirs $(SUBDIRS)
 
 all: subdirs
 
+bison-native: gettext-native m4-native
+fontconfig: bzip2 expat freetype2 libiconv zlib
+gettext: libiconv
 glib: libiconv zlib
-libxml2: zlib python27
-python27: python27-native
+glib-native: libiconv-native
+libgcrypt: libgpg-error
+libpng: zlib
+libxml2: python27 readline zlib
+libxslt: libgcrypt libxml2 python27
+openssl: zlib
+python27: bzip2 libffi ncurses openssl python27-native sqlite3 zlib
+readline: ncurses
 zlib: zlib-native
 
 buildtools: $(BUILDTOOLS)
@@ -29,7 +44,7 @@ $(BUILDTOOLS):
 
 subdirs: $(SUBDIRS)
 $(SUBDIRS): $(BUILDTOOLS)
-	@$(MAKE) all -C $@
+	@$(MAKE) -C $@
 
 clean:
 	@for d in $(BUILDTOOLS); do $(MAKE) -C $$d $@; done
@@ -38,4 +53,5 @@ clean:
 distclean:
 	@for d in $(BUILDTOOLS); do $(MAKE) -C $$d $@; done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
+	@rm -rf @use_prefix@
 

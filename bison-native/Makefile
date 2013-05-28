@@ -2,13 +2,13 @@ NATIVE_BUILD=1
 
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = bison
+LIBVER  = 2.7
+LIBURL  = http://ftp.gnu.org/gnu/bison
 LIBSRC  = $(LIBNAME)-$(LIBVER)
-LIBFILE = $(LIBSRC).tar.gz
+LIBFILE = $(LIBSRC).tar.xz
 
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
+BINFILE = $(PREFIX)/bin/bison
 
 all: .install-$(PLATFORM)
 
@@ -21,10 +21,10 @@ $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
 	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
 
-$(PCFILE): $(PLATFORM)
+$(BINFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)
 
-.install-$(PLATFORM): $(PCFILE)
+.install-$(PLATFORM): $(BINFILE)
 	@$(MAKE) -C $(PLATFORM) install
 	@touch $@
 

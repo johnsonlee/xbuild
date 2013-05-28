@@ -2,13 +2,13 @@ NATIVE_BUILD=1
 
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = Cython
+LIBVER  = 0.19.1
+LIBURL  = http://cython.org/release
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz
 
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
+BINFILE = $(PREFIX)/bin/cpython
 
 all: .install-$(PLATFORM)
 
@@ -19,13 +19,12 @@ $(TARBALLS_LOCATION)/$(LIBFILE):
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
+	@cd $(PLATFORM); python setup.py install --prefix=$(PREFIX)
 
-$(PCFILE): $(PLATFORM)
+$(BINFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)
 
-.install-$(PLATFORM): $(PCFILE)
-	@$(MAKE) -C $(PLATFORM) install
+.install-$(PLATFORM): $(BINFILE)
 	@touch $@
 
 clean:

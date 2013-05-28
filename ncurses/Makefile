@@ -1,14 +1,12 @@
-NATIVE_BUILD=1
-
 include ../Makefile.include
 
-LIBNAME = zlib
-LIBVER  = 1.2.7
-LIBURL  = http://zlib.net
+LIBNAME = ncurses
+LIBVER  = 5.9
+LIBURL  = http://ftp.gnu.org/gnu/ncurses
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz
 
-PCFILE = $(PREFIX)/lib/pkgconfig/zlib.pc
+BINFILE = $(PREFIX)/lib/lib$(LIBNAME).a
 
 all: .install-$(PLATFORM)
 
@@ -19,12 +17,12 @@ $(TARBALLS_LOCATION)/$(LIBFILE):
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); ./configure --prefix=$(PREFIX)
+	@cd $(PLATFORM); ./configure --build=$(BUILD) --host=$(HOST) --prefix=$(PREFIX)
 
-$(PCFILE): $(PLATFORM)
+$(BINFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)
 
-.install-$(PLATFORM): $(PCFILE)
+.install-$(PLATFORM): $(BINFILE)
 	@$(MAKE) -C $(PLATFORM) install
 	@touch $@
 

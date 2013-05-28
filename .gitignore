@@ -1,6 +1,11 @@
 .*.swp
 .install-*
 *.cache
+
 config.log
 config.status
-configure
+config.cache
+
+/configure
+/Makefile
+/Makefile.include

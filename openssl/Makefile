@@ -1,28 +1,30 @@
 include ../Makefile.include
 
-LIBNAME = tiff
-LIBVER  = 4.0.3
-LIBURL  = ftp://ftp.remotesensing.org/pub/libtiff
+LIBNAME = openssl
+LIBVER  = 1.0.1c
+LIBURL  = http://www.openssl.org/source
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz
+
+PCFILE = $(PREFIX)/lib/pkgconfig/$(LIBNAME).pc
 
 all: .install-$(PLATFORM)
 
 $(TARBALLS_LOCATION)/$(LIBFILE):
-	@echo "Downloading $(LIBURL)/$(LIBFILE) -> $(TARBALLS_LOCATION)"
+	@echo "Downloading from $(LIBURL)/$(LIBFILE)"
 	@$(WGET) $(WGET_FLAGS) $(LIBURL)/$(LIBFILE)
 
 $(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE)
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
+	@cd $(PLATFORM); ./config --prefix=$(PREFIX) --openssldir=$(PREFIX) no-asm no-shared
 
-.install-$(PLATFORM): configure
+$(PCFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM)
+
+.install-$(PLATFORM): $(PCFILE)
 	@$(MAKE) -C $(PLATFORM) install
 	@touch $@
-
-configure: $(PLATFORM)
-	@cd $(PLATFORM); ./configure --host=$(HOST) --prefix=$(PREFIX)
 
 clean:
 	@$(MAKE) -C $(PLATFORM) clean
