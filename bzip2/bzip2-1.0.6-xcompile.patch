@@ -1,0 +1,63 @@
+diff -Naur a/Makefile b/Makefile
+--- a/Makefile	2013-05-28 14:39:35.668576434 +0800
++++ b/Makefile	2013-05-28 14:42:34.196113325 +0800
+@@ -15,16 +15,16 @@
+ SHELL=/bin/sh
+ 
+ # To assist in cross-compiling
+-CC=gcc
+-AR=ar
+-RANLIB=ranlib
+-LDFLAGS=
++#CC=gcc
++#AR=ar
++#RANLIB=ranlib
++#LDFLAGS=
+ 
+ BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)
++#CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)
+ 
+ # Where you want it installed when you do 'make install'
+-PREFIX=/usr/local
++#PREFIX=/usr/local
+ 
+ 
+ OBJS= blocksort.o  \
+@@ -35,7 +35,7 @@
+       decompress.o \
+       bzlib.o
+ 
+-all: libbz2.a bzip2 bzip2recover test
++all: libbz2.a bzip2 bzip2recover
+ 
+ bzip2: libbz2.a bzip2.o
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2 bzip2.o -L. -lbz2
+diff -Naur a/Makefile-libbz2_so b/Makefile-libbz2_so
+--- a/Makefile-libbz2_so	2013-05-28 14:40:30.356432451 +0800
++++ b/Makefile-libbz2_so	2013-05-28 14:53:39.939756140 +0800
+@@ -22,9 +22,9 @@
+ 
+ 
+ SHELL=/bin/sh
+-CC=gcc
++#CC=gcc
+ BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
++#CFLAGS=-fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
+ 
+ OBJS= blocksort.o  \
+       huffman.o    \
+@@ -40,6 +40,12 @@
+ 	rm -f libbz2.so.1.0
+ 	ln -s libbz2.so.1.0.6 libbz2.so.1.0
+ 
++install: libbz2.so.1.0.6
++	if ( test ! -d $(PREFIX)/lib ); then mkdir -p $(PREFIX)/lib; fi
++	cp -f libbz2.so.1.0.6 $(PREFIX)/lib
++	ln -s $(PREFIX)/lib/libbz2.so.1.0.6 $(PREFIX)/lib/libbz2.so.1.0
++	ln -s $(PREFIX)/lib/libbz2.so.1.0 $(PREFIX)/lib/libbz2.so
++
+ clean: 
+ 	rm -f $(OBJS) bzip2.o libbz2.so.1.0.6 libbz2.so.1.0 bzip2-shared
+ 
