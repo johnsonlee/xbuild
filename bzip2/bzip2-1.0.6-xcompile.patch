@@ -1,0 +1,91 @@
+diff -Naur a/Makefile b/Makefile
+--- a/Makefile	2013-06-04 22:56:35.918403102 +0800
++++ b/Makefile	2013-06-04 23:04:57.086153959 +0800
+@@ -14,18 +14,8 @@
+ 
+ SHELL=/bin/sh
+ 
+-# To assist in cross-compiling
+-CC=gcc
+-AR=ar
+-RANLIB=ranlib
+-LDFLAGS=
+-
+ BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)
+-
+-# Where you want it installed when you do 'make install'
+-PREFIX=/usr/local
+-
++CFLAGS += $(BIGFILES)
+ 
+ OBJS= blocksort.o  \
+       huffman.o    \
+@@ -35,7 +25,7 @@
+       decompress.o \
+       bzlib.o
+ 
+-all: libbz2.a bzip2 bzip2recover test
++all: libbz2.a bzip2 bzip2recover
+ 
+ bzip2: libbz2.a bzip2.o
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2 bzip2.o -L. -lbz2
+@@ -52,23 +42,6 @@
+ 		$(RANLIB) libbz2.a ; \
+ 	fi
+ 
+-check: test
+-test: bzip2
+-	@cat words1
+-	./bzip2 -1  < sample1.ref > sample1.rb2
+-	./bzip2 -2  < sample2.ref > sample2.rb2
+-	./bzip2 -3  < sample3.ref > sample3.rb2
+-	./bzip2 -d  < sample1.bz2 > sample1.tst
+-	./bzip2 -d  < sample2.bz2 > sample2.tst
+-	./bzip2 -ds < sample3.bz2 > sample3.tst
+-	cmp sample1.bz2 sample1.rb2 
+-	cmp sample2.bz2 sample2.rb2
+-	cmp sample3.bz2 sample3.rb2
+-	cmp sample1.tst sample1.ref
+-	cmp sample2.tst sample2.ref
+-	cmp sample3.tst sample3.ref
+-	@cat words3
+-
+ install: bzip2 bzip2recover
+ 	if ( test ! -d $(PREFIX)/bin ) ; then mkdir -p $(PREFIX)/bin ; fi
+ 	if ( test ! -d $(PREFIX)/lib ) ; then mkdir -p $(PREFIX)/lib ; fi
+@@ -138,7 +111,7 @@
+ 	rm -f manual.ps manual.html manual.pdf
+ 
+ DISTNAME=bzip2-1.0.6
+-dist: check manual
++dist: manual
+ 	rm -f $(DISTNAME)
+ 	ln -s -f . $(DISTNAME)
+ 	tar cvf $(DISTNAME).tar \
+diff -Naur a/Makefile-libbz2_so b/Makefile-libbz2_so
+--- a/Makefile-libbz2_so	2013-06-04 22:51:33.538404275 +0800
++++ b/Makefile-libbz2_so	2013-06-04 23:08:45.587062771 +0800
+@@ -22,9 +22,8 @@
+ 
+ 
+ SHELL=/bin/sh
+-CC=gcc
+ BIGFILES=-D_FILE_OFFSET_BITS=64
+-CFLAGS=-fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
++CFLAGS += $(BIGFILES)
+ 
+ OBJS= blocksort.o  \
+       huffman.o    \
+@@ -43,6 +42,11 @@
+ clean: 
+ 	rm -f $(OBJS) bzip2.o libbz2.so.1.0.6 libbz2.so.1.0 bzip2-shared
+ 
++install: $(PREFIX)/lib
++	if [ ! -d $^ ]; then mkdir -p $^; fi
++	cp libbz2.so.1.0.6 $(PREFIX)/lib
++	cd $(PREFIX)/lib; ln -s libbz2.so.1.0.6 libbz2.so.1.0; ln -s libbz2.so.1.0 libbz2.so
++
+ blocksort.o: blocksort.c
+ 	$(CC) $(CFLAGS) -c blocksort.c
+ huffman.o: huffman.c

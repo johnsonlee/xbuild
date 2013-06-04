@@ -3,7 +3,7 @@ NATIVE_BUILD=1
 include ../Makefile.include
 
 LIBNAME = gettext
-LIBVER  = 0.18.2
+LIBVER  = 0.18
 LIBURL  = http://ftp.gnu.org/gnu/gettext
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz

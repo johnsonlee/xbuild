@@ -14,10 +14,10 @@ $(TARBALLS_LOCATION)/$(LIBFILE):
 	@echo "Downloading $(LIBURL)/$(LIBFILE) -> $(TARBALLS_LOCATION)"
 	@$(WGET) $(WGET_FLAGS) $(LIBURL)/$(LIBFILE)
 
-$(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE) Makefile.patch
+$(PLATFORM): $(TARBALLS_LOCATION)/$(LIBFILE) $(LIBSRC)-xcompile.patch
 	@rm -rf $(PLATFORM)/*; mkdir -p $(PLATFORM)
 	@$(TAR) $(TAR_FLAGS) $(TARBALLS_LOCATION)/$(LIBFILE)
-	@cd $(PLATFORM); patch -p1 < ../libbz2-xcompile.patch
+	@cd $(PLATFORM); patch -p1 < ../$(LIBSRC)-xcompile.patch
 
 $(BINFILE): $(PLATFORM)
 	@$(MAKE) -C $(PLATFORM) PREFIX=$(PREFIX)
