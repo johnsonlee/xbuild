@@ -9,7 +9,7 @@ SUBDIRS=\
 	glib glib-native \
 	libffi libffi-native \
 	libgcrypt \
-	libgpg-error \
+	libgpg-error-native \
 	libiconv libiconv-native \
 	libjpeg \
 	libpng \
@@ -27,9 +27,9 @@ all: subdirs
 bison-native: gettext-native m4-native
 fontconfig: bzip2 expat freetype2 libiconv zlib
 gettext: libiconv
-glib: libiconv zlib
+glib: glib-native libiconv zlib
 glib-native: libiconv-native
-libgcrypt: libgpg-error
+libgcrypt: libgpg-error-native
 libpng: zlib
 libxml2: python27 readline zlib
 libxslt: libgcrypt libxml2 python27

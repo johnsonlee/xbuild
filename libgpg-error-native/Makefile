@@ -1,3 +1,5 @@
+NATIVE_BUILD=1
+
 include ../Makefile.include
 
 LIBNAME = libgpg-error

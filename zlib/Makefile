@@ -1,7 +1,7 @@
 include ../Makefile.include
 
 LIBNAME = zlib
-LIBVER  = 1.2.7
+LIBVER  = 1.2.8
 LIBURL  = http://zlib.net
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.gz

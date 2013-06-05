@@ -1,8 +1,8 @@
 include ../Makefile.include
 
 LIBNAME = libpng
-LIBVER  = 1.5.13
-LIBURL  = http://nchc.dl.sourceforge.net/project/libpng/libpng15/1.5.13
+LIBVER  = 1.6.2
+LIBURL  = http://nchc.dl.sourceforge.net/project/libpng/libpng16/1.6.2
 LIBSRC  = $(LIBNAME)-$(LIBVER)
 LIBFILE = $(LIBSRC).tar.xz
 
